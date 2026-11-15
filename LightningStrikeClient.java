@@ -15,7 +15,6 @@ public class LightningStrikeClient implements ClientModInitializer {
 			boolean down = client.options.keyAttack.isDown();
 			if (down && !wasDown
 					&& client.player != null
-					&& client.screen == null
 					&& client.player.getMainHandItem().is(ItemTags.SWORDS)) {
 				ClientPlayNetworking.send(new LightningStrikePayload());
 			}
