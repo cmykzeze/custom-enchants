@@ -2,6 +2,7 @@
   "replace": false,
   "values": [
     "lightningstrike:lightning_strike",
-    "lightningstrike:frozen_heart"
+    "lightningstrike:frozen_heart",
+    "lightningstrike:bleed"
   ]
 }

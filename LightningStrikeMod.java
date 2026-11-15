@@ -18,5 +18,6 @@ public class LightningStrikeMod implements ModInitializer {
 		ServerTickEvents.END_SERVER_TICK.register(RageAbility::tick);
 		RageLoot.register();
 		FrozenHeartAbility.register();
+		BleedAbility.register();
 	}
 }

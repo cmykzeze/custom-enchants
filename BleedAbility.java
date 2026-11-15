@@ -1,5 +1,6 @@
 package com.example.lightningstrike;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -154,7 +155,7 @@ public class BleedAbility {
 			if (now >= b.nextPulseTick) {
 				ServerLevel level = (ServerLevel) target.level();
 				// Magic damage: ignores armor and gives no knockback. Reset the hit cooldown so the pulse always lands.
-				target.invulnerableTime = 0;
+				resetHurtCooldown(target);
 				target.hurtServer(level, level.damageSources().magic(), totalHearts(b.level) * 2f / PULSES);
 				blood(level, target, 8);
 				b.pulsesLeft--;
@@ -181,6 +182,29 @@ public class BleedAbility {
 					attr.addTransientModifier(new AttributeModifier(
 							PENALTY_ID, desired, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
 				}
+			}
+		}
+	}
+
+	// invulnerableTime is private in Entity on this Minecraft version, so it is reached through reflection.
+	private static Field invulnerableTimeField;
+	private static boolean invulnerableTimeLookedUp;
+
+	private static void resetHurtCooldown(LivingEntity target) {
+		if (!invulnerableTimeLookedUp) {
+			invulnerableTimeLookedUp = true;
+			try {
+				invulnerableTimeField = net.minecraft.world.entity.Entity.class.getDeclaredField("invulnerableTime");
+				invulnerableTimeField.setAccessible(true);
+			} catch (ReflectiveOperationException | RuntimeException e) {
+				invulnerableTimeField = null;
+			}
+		}
+		if (invulnerableTimeField != null) {
+			try {
+				invulnerableTimeField.setInt(target, 0);
+			} catch (IllegalAccessException | RuntimeException ignored) {
+				// If this fails the bleed still works, it just can't skip the hit cooldown.
 			}
 		}
 	}
