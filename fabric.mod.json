@@ -8,7 +8,8 @@
   "license": "MIT",
   "environment": "*",
   "entrypoints": {
-    "main": ["com.example.lightningstrike.LightningStrikeMod"]
+    "main": ["com.example.lightningstrike.LightningStrikeMod"],
+    "client": ["com.example.lightningstrike.LightningStrikeClient"]
   },
   "depends": {
     "fabricloader": ">=0.19.5",
