@@ -25,7 +25,7 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 
 /**
- * Rage (levels I to X):
+ * Rage (levels I to VII):
  *  - alone: bonus melee damage while holding the sword
  *  - with Lightning Strike: every enemy a Lightning Strike hits adds bonus damage (up to a cap).
  *    The bonus lasts while you are in combat and is lost after 5 seconds without combat.
@@ -41,19 +41,28 @@ public class RageAbility {
 	// ---- Tweak these numbers if you want ----
 	private static final int COMBAT_TIMEOUT_TICKS = 100; // 5 seconds
 
-	/** Bonus with Rage alone, in hearts: I = 0.5 ... X = 1.4 */
+	// Index 0 = level I ... index 6 = level VII.
+	/** Bonus with Rage alone, in hearts: I = 0.40 ... V = 0.60, VII = 0.70 */
+	private static final double[] ALONE = {0.40, 0.45, 0.50, 0.55, 0.60, 0.65, 0.70};
+	/** Bonus per enemy hit by Lightning Strike, in hearts: I = 0.40 ... V = 0.52, VII = 0.56 */
+	private static final double[] PER_ENEMY = {0.40, 0.43, 0.46, 0.49, 0.52, 0.54, 0.56};
+	/** Maximum combo bonus, in hearts: I = 2.2 ... V = 2.9, VII = 3.1 */
+	private static final double[] CAP = {2.2, 2.4, 2.6, 2.8, 2.9, 3.0, 3.1};
+
+	private static double pick(double[] table, int level) {
+		return table[Math.max(1, Math.min(table.length, level)) - 1];
+	}
+
 	private static double aloneHearts(int level) {
-		return 0.5 + 0.1 * (level - 1);
+		return pick(ALONE, level);
 	}
 
-	/** Bonus per enemy hit by Lightning Strike, in hearts: I = 0.5 ... X = 0.95 */
 	private static double perEnemyHearts(int level) {
-		return 0.5 + 0.05 * (level - 1);
+		return pick(PER_ENEMY, level);
 	}
 
-	/** Maximum combo bonus, in hearts: I = 3.0 ... X = 4.8 */
 	private static double capHearts(int level) {
-		return 3.0 + 0.2 * (level - 1);
+		return pick(CAP, level);
 	}
 
 	private static class State {

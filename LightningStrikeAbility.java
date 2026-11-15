@@ -33,6 +33,7 @@ public class LightningStrikeAbility {
 	private static final int COOLDOWN_TICKS_LEVEL_1 = 200; // 10 seconds at level I
 	private static final int COOLDOWN_TICKS_LEVEL_5 = 100; // 5 seconds at level V (levels in between are evenly spaced)
 	private static final float DAMAGE = 8.0f;            // 4 hearts per hit, every level
+	private static final float FOCUS_MULTIPLIER = 1.5f;  // damage x1.5 when there is only one enemy in range (all branches focus on it)
 	private static final int BRANCHES_PER_LEVEL = 2;     // level I = 2 branches, V = 10
 	private static final double BASE_RANGE = 10.0;       // level I = 10 blocks
 	private static final double RANGE_PER_LEVEL = 5.0;   // +5 blocks per extra level (V = 30)
@@ -89,8 +90,12 @@ public class LightningStrikeAbility {
 		targets.sort(Comparator.comparingDouble(t -> t.distanceToSqr(player)));
 
 		DustParticleOptions yellow = new DustParticleOptions(YELLOW, 1.0f);
+		RandomSource rnd = player.getRandom();
 		int used = 0;
 		int hits = 0;
+
+		// Only one enemy in range: every branch focuses on it and the hit is stronger
+		boolean focus = targets.size() == 1;
 
 		// One branch per target, nearest first (skip targets behind walls)
 		for (LivingEntity t : targets) {
@@ -103,22 +108,34 @@ public class LightningStrikeAbility {
 			if (los.getType() != HitResult.Type.MISS) {
 				continue;
 			}
-			// One branch = one target = one hit
+			// One branch = one target = one hit (x1.5 damage when it is the only target)
 			if (beam(server, player, origin, center.subtract(origin).normalize(),
-					Math.min(range, origin.distanceTo(center)), yellow, t)) {
+					Math.min(range, origin.distanceTo(center)), yellow, t,
+					focus ? DAMAGE * FOCUS_MULTIPLIER : DAMAGE)) {
 				hits++;
 			}
 			used++;
+
+			// The other branches all converge on that same enemy, just for show (the damage is dealt once)
+			if (focus) {
+				for (; used < branches; used++) {
+					Vec3 aim = center.add(
+							(rnd.nextDouble() - 0.5) * 0.8,
+							(rnd.nextDouble() - 0.5) * 0.8,
+							(rnd.nextDouble() - 0.5) * 0.8);
+					beam(server, player, origin, aim.subtract(origin).normalize(),
+							Math.min(range, origin.distanceTo(aim)), yellow, null, 0f);
+				}
+			}
 		}
 
 		// Leftover branches (no target left) fan out in front of you, just for show
-		RandomSource rnd = player.getRandom();
 		for (; used < branches; used++) {
 			Vec3 dir = (used == 0 ? look : look.add(
 					(rnd.nextDouble() - 0.5) * 0.9,
 					(rnd.nextDouble() - 0.5) * 0.5,
 					(rnd.nextDouble() - 0.5) * 0.9)).normalize();
-			beam(server, player, origin, dir, range, yellow, null);
+			beam(server, player, origin, dir, range, yellow, null, 0f);
 		}
 
 		server.playSound(null, player.blockPosition(),
@@ -129,7 +146,7 @@ public class LightningStrikeAbility {
 	/** Draws one straight yellow line. If it has a target, that target takes damage exactly once.
 	 *  Returns true if a target was damaged. */
 	private static boolean beam(ServerLevel server, ServerPlayer player, Vec3 start, Vec3 dir,
-			double maxLength, DustParticleOptions particle, LivingEntity target) {
+			double maxLength, DustParticleOptions particle, LivingEntity target, float damage) {
 		double length = maxLength;
 		var blockHit = server.clip(new ClipContext(start, start.add(dir.scale(maxLength)),
 				ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player));
@@ -143,7 +160,7 @@ public class LightningStrikeAbility {
 		}
 
 		if (target != null && target.isAlive()) {
-			return target.hurtServer(server, server.damageSources().indirectMagic(player, player), DAMAGE);
+			return target.hurtServer(server, server.damageSources().indirectMagic(player, player), damage);
 		}
 		return false;
 	}
