@@ -1,6 +1,6 @@
 {
   "description": { "translate": "enchantment.lightningstrike.lightning_strike" },
-  "supported_items": "#minecraft:enchantable/sword",
+  "supported_items": "#minecraft:swords",
   "weight": 1,
   "max_level": 1,
   "min_cost": { "base": 30, "per_level_above_first": 0 },
