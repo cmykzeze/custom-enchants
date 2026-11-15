@@ -1,10 +1,8 @@
 package com.example.lightningstrike;
 
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.particles.DustParticleOptions;
@@ -24,7 +22,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.ClipContext;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
@@ -33,8 +30,9 @@ public class LightningStrikeAbility {
 			Registries.ENCHANTMENT, Identifier.fromNamespaceAndPath(LightningStrikeMod.MOD_ID, "lightning_strike"));
 
 	// ---- Tweak these numbers if you want ----
-	private static final int COOLDOWN_TICKS = 200;       // 10 seconds
-	private static final float DAMAGE = 8.0f;            // 4 hearts per hit
+	private static final int COOLDOWN_TICKS = 200;       // 10 seconds (levels I and II)
+	private static final int COOLDOWN_TICKS_HIGH = 300;  // 15 seconds (levels III, IV and V)
+	private static final float DAMAGE = 8.0f;            // 4 hearts per hit, every level
 	private static final int BRANCHES_PER_LEVEL = 2;     // level I = 2 branches, V = 10
 	private static final double BASE_RANGE = 10.0;       // level I = 10 blocks
 	private static final double RANGE_PER_LEVEL = 5.0;   // +5 blocks per extra level (V = 30)
@@ -43,9 +41,7 @@ public class LightningStrikeAbility {
 
 	/** Called on the server when a player left-clicks with a sword. */
 	public static void activate(ServerPlayer player) {
-		if (!(player.level() instanceof ServerLevel server)) {
-			return;
-		}
+		ServerLevel server = (ServerLevel) player.level();
 		ItemStack stack = player.getMainHandItem();
 		if (!stack.is(ItemTags.SWORDS)) {
 			return;
@@ -56,7 +52,7 @@ public class LightningStrikeAbility {
 		}
 
 		fire(server, player, level);
-		player.getCooldowns().addCooldown(stack, COOLDOWN_TICKS);
+		player.getCooldowns().addCooldown(stack, level >= 3 ? COOLDOWN_TICKS_HIGH : COOLDOWN_TICKS);
 	}
 
 	private static int getLevel(ServerLevel server, ItemStack stack) {
@@ -84,7 +80,6 @@ public class LightningStrikeAbility {
 		targets.sort(Comparator.comparingDouble(t -> t.distanceToSqr(player)));
 
 		DustParticleOptions yellow = new DustParticleOptions(YELLOW, 1.0f);
-		Set<LivingEntity> hit = new HashSet<>();
 		int used = 0;
 
 		// One branch per target, nearest first (skip targets behind walls)
@@ -98,28 +93,29 @@ public class LightningStrikeAbility {
 			if (los.getType() != HitResult.Type.MISS) {
 				continue;
 			}
+			// One branch = one target = one hit
 			beam(server, player, origin, center.subtract(origin).normalize(),
-					Math.min(range, origin.distanceTo(center) + 0.5), yellow, hit);
+					Math.min(range, origin.distanceTo(center)), yellow, t);
 			used++;
 		}
 
-		// Leftover branches fan out in front of you
+		// Leftover branches (no target left) fan out in front of you, just for show
 		RandomSource rnd = player.getRandom();
 		for (; used < branches; used++) {
 			Vec3 dir = (used == 0 ? look : look.add(
 					(rnd.nextDouble() - 0.5) * 0.9,
 					(rnd.nextDouble() - 0.5) * 0.5,
 					(rnd.nextDouble() - 0.5) * 0.9)).normalize();
-			beam(server, player, origin, dir, range, yellow, hit);
+			beam(server, player, origin, dir, range, yellow, null);
 		}
 
 		server.playSound(null, player.blockPosition(),
 				SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.PLAYERS, 0.5f, 1.6f);
 	}
 
-	/** Draws one straight yellow line and damages anything on it (once per cast). */
+	/** Draws one straight yellow line. If it has a target, that target takes damage exactly once. */
 	private static void beam(ServerLevel server, ServerPlayer player, Vec3 start, Vec3 dir,
-			double maxLength, DustParticleOptions particle, Set<LivingEntity> hit) {
+			double maxLength, DustParticleOptions particle, LivingEntity target) {
 		double length = maxLength;
 		var blockHit = server.clip(new ClipContext(start, start.add(dir.scale(maxLength)),
 				ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player));
@@ -130,15 +126,10 @@ public class LightningStrikeAbility {
 		for (double d = 0.8; d <= length; d += STEP) {
 			Vec3 p = start.add(dir.scale(d));
 			server.sendParticles(particle, p.x, p.y, p.z, 1, 0, 0, 0, 0);
+		}
 
-			AABB box = new AABB(p, p).inflate(0.6);
-			for (LivingEntity e : server.getEntitiesOfClass(LivingEntity.class, box,
-					t -> t != player && t.isAlive() && !t.isSpectator()
-							&& (t instanceof Enemy || t instanceof Player))) {
-				if (hit.add(e)) {
-					e.hurtServer(server, server.damageSources().indirectMagic(player, player), DAMAGE);
-				}
-			}
+		if (target != null && target.isAlive()) {
+			target.hurtServer(server, server.damageSources().indirectMagic(player, player), DAMAGE);
 		}
 	}
 }
