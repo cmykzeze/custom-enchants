@@ -1,12 +1,16 @@
 package com.example.lightningstrike;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
@@ -80,6 +84,54 @@ public class RageAbility {
 		s.lastActiveTick = player.tickCount;
 	}
 
+	/** Tells the player in chat whenever their Rage bonus changes (hearts of extra damage). */
+	private static void announce(ServerPlayer player, int rageLevel, boolean comboMode, double desired) {
+		String text;
+		if (desired > 0 && comboMode) {
+			text = String.format(Locale.ROOT, "Rage combo: +%.2f hearts damage (max +%.1f)",
+					desired / 2, capHearts(rageLevel));
+		} else if (desired > 0) {
+			text = String.format(Locale.ROOT, "Rage: +%.1f hearts damage", desired / 2);
+		} else if (rageLevel > 0 && comboMode) {
+			text = "Rage combo reset";
+		} else {
+			text = "Rage bonus gone";
+		}
+		// Sent only to this player, so only the holder sees it
+		player.sendSystemMessage(rainbow(text, player.tickCount));
+	}
+
+	/** Rainbow text: each letter gets the next colour of the rainbow. The starting colour shifts over time. */
+	private static Component rainbow(String text, int tick) {
+		MutableComponent out = Component.empty();
+		double shift = (tick % 60) / 60.0;
+		int n = Math.max(1, text.length());
+		for (int i = 0; i < text.length(); i++) {
+			double hue = (shift + (double) i / n) % 1.0;
+			out.append(Component.literal(String.valueOf(text.charAt(i)))
+					.withStyle(Style.EMPTY.withColor(rainbowColor(hue))));
+		}
+		return out;
+	}
+
+	/** Full-brightness colour for a hue from 0 to 1, as 0xFFRRGGBB. */
+	private static int rainbowColor(double hue) {
+		double h = hue * 6;
+		int sector = (int) Math.floor(h) % 6;
+		int rise = (int) Math.round(255 * (h - Math.floor(h)));
+		int fall = 255 - rise;
+		int r, g, b;
+		switch (sector) {
+			case 0 -> { r = 255; g = rise; b = 0; }
+			case 1 -> { r = fall; g = 255; b = 0; }
+			case 2 -> { r = 0; g = 255; b = rise; }
+			case 3 -> { r = 0; g = fall; b = 255; }
+			case 4 -> { r = rise; g = 0; b = 255; }
+			default -> { r = 255; g = 0; b = fall; }
+		}
+		return 0xFF000000 | (r << 16) | (g << 8) | b;
+	}
+
 	/** Runs every server tick. */
 	public static void tick(MinecraftServer server) {
 		for (ServerPlayer player : server.getPlayerList().getPlayers()) {
@@ -98,10 +150,12 @@ public class RageAbility {
 
 			// How much bonus should apply right now
 			double desired = 0;
+			boolean comboMode = false;
 			ItemStack stack = player.getMainHandItem();
 			int rageLevel = stack.is(ItemTags.SWORDS) ? getLevel(level, stack, RAGE) : 0;
 			if (rageLevel > 0) {
 				if (getLevel(level, stack, LightningStrikeAbility.LIGHTNING_STRIKE) > 0) {
+					comboMode = true;
 					desired = Math.min(s.comboBonus, capHearts(rageLevel) * 2);
 				} else {
 					desired = aloneHearts(rageLevel) * 2;
@@ -120,6 +174,7 @@ public class RageAbility {
 					attr.addTransientModifier(new AttributeModifier(
 							MODIFIER_ID, desired, AttributeModifier.Operation.ADD_VALUE));
 				}
+				announce(player, rageLevel, comboMode, desired);
 			}
 		}
 	}

@@ -1,4 +1,7 @@
 {
   "replace": false,
-  "values": ["lightningstrike:lightning_strike"]
+  "values": [
+    "lightningstrike:lightning_strike",
+    "lightningstrike:frozen_heart"
+  ]
 }
