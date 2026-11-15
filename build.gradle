@@ -41,7 +41,7 @@ processResources {
 		into 'assets/lightningstrike/lang'
 	}
 	from('.') {
-		include 'lightning_strike.json'
+		include 'lightning_strike.json', 'rage.json'
 		into 'data/lightningstrike/enchantment'
 	}
 	from('.') {

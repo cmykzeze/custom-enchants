@@ -30,8 +30,8 @@ public class LightningStrikeAbility {
 			Registries.ENCHANTMENT, Identifier.fromNamespaceAndPath(LightningStrikeMod.MOD_ID, "lightning_strike"));
 
 	// ---- Tweak these numbers if you want ----
-	private static final int COOLDOWN_TICKS = 200;       // 10 seconds (levels I and II)
-	private static final int COOLDOWN_TICKS_HIGH = 300;  // 15 seconds (levels III, IV and V)
+	private static final int COOLDOWN_TICKS_LEVEL_1 = 200; // 10 seconds at level I
+	private static final int COOLDOWN_TICKS_LEVEL_5 = 100; // 5 seconds at level V (levels in between are evenly spaced)
 	private static final float DAMAGE = 8.0f;            // 4 hearts per hit, every level
 	private static final int BRANCHES_PER_LEVEL = 2;     // level I = 2 branches, V = 10
 	private static final double BASE_RANGE = 10.0;       // level I = 10 blocks
@@ -51,8 +51,16 @@ public class LightningStrikeAbility {
 			return;
 		}
 
-		fire(server, player, level);
-		player.getCooldowns().addCooldown(stack, level >= 3 ? COOLDOWN_TICKS_HIGH : COOLDOWN_TICKS);
+		int hits = fire(server, player, level);
+		RageAbility.onLightningStrike(server, player, stack, hits);
+		player.getCooldowns().addCooldown(stack, cooldownTicks(level));
+	}
+
+	/** Higher level = shorter cooldown: I = 10s, II = 8.75s, III = 7.5s, IV = 6.25s, V = 5s. */
+	private static int cooldownTicks(int level) {
+		int l = Math.max(1, Math.min(5, level));
+		return COOLDOWN_TICKS_LEVEL_1
+				- (COOLDOWN_TICKS_LEVEL_1 - COOLDOWN_TICKS_LEVEL_5) * (l - 1) / 4;
 	}
 
 	private static int getLevel(ServerLevel server, ItemStack stack) {
@@ -64,7 +72,8 @@ public class LightningStrikeAbility {
 		return EnchantmentHelper.getItemEnchantmentLevel(holder.get(), stack);
 	}
 
-	private static void fire(ServerLevel server, ServerPlayer player, int level) {
+	/** Fires the strike and returns how many enemies it damaged. */
+	private static int fire(ServerLevel server, ServerPlayer player, int level) {
 		int branches = level * BRANCHES_PER_LEVEL;
 		double range = BASE_RANGE + (level - 1) * RANGE_PER_LEVEL;
 
@@ -81,6 +90,7 @@ public class LightningStrikeAbility {
 
 		DustParticleOptions yellow = new DustParticleOptions(YELLOW, 1.0f);
 		int used = 0;
+		int hits = 0;
 
 		// One branch per target, nearest first (skip targets behind walls)
 		for (LivingEntity t : targets) {
@@ -94,8 +104,10 @@ public class LightningStrikeAbility {
 				continue;
 			}
 			// One branch = one target = one hit
-			beam(server, player, origin, center.subtract(origin).normalize(),
-					Math.min(range, origin.distanceTo(center)), yellow, t);
+			if (beam(server, player, origin, center.subtract(origin).normalize(),
+					Math.min(range, origin.distanceTo(center)), yellow, t)) {
+				hits++;
+			}
 			used++;
 		}
 
@@ -111,10 +123,12 @@ public class LightningStrikeAbility {
 
 		server.playSound(null, player.blockPosition(),
 				SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.PLAYERS, 0.5f, 1.6f);
+		return hits;
 	}
 
-	/** Draws one straight yellow line. If it has a target, that target takes damage exactly once. */
-	private static void beam(ServerLevel server, ServerPlayer player, Vec3 start, Vec3 dir,
+	/** Draws one straight yellow line. If it has a target, that target takes damage exactly once.
+	 *  Returns true if a target was damaged. */
+	private static boolean beam(ServerLevel server, ServerPlayer player, Vec3 start, Vec3 dir,
 			double maxLength, DustParticleOptions particle, LivingEntity target) {
 		double length = maxLength;
 		var blockHit = server.clip(new ClipContext(start, start.add(dir.scale(maxLength)),
@@ -129,7 +143,8 @@ public class LightningStrikeAbility {
 		}
 
 		if (target != null && target.isAlive()) {
-			target.hurtServer(server, server.damageSources().indirectMagic(player, player), DAMAGE);
+			return target.hurtServer(server, server.damageSources().indirectMagic(player, player), DAMAGE);
 		}
+		return false;
 	}
 }

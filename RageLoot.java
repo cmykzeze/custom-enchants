@@ -10,7 +10,7 @@ import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.functions.SetEnchantmentsFunction;
 import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceCondition;
-import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProviders;
 
 /**
  * Adds Rage books to chests:
@@ -33,7 +33,7 @@ public class RageLoot {
 			}
 
 			Holder<Enchantment> rage = registries.lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(RageAbility.RAGE);
-			LootPool.Builder pool = LootPool.lootPool().setRolls(ConstantValue.exactly(1));
+			LootPool.Builder pool = LootPool.lootPool().setRolls(ContextIntProviders.exactly(1));
 
 			if (ancientCity) {
 				pool.when(LootItemRandomChanceCondition.randomChance(ANCIENT_CITY_CHANCE));
@@ -57,6 +57,6 @@ public class RageLoot {
 	private static LootItem.Builder<?> book(Holder<Enchantment> rage, int level, int weight) {
 		return LootItem.lootTableItem(Items.ENCHANTED_BOOK)
 				.setWeight(weight)
-				.apply(new SetEnchantmentsFunction.Builder().withEnchantment(rage, ConstantValue.exactly(level)));
+				.apply(new SetEnchantmentsFunction.Builder().withEnchantment(rage, ContextIntProviders.exactly(level)));
 	}
 }
