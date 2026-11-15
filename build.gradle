@@ -10,19 +10,43 @@ base {
 	archivesName = project.archives_base_name
 }
 
-repositories {
-}
-
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 }
 
+// FLAT LAYOUT: all files sit in the repo root, no folders needed.
+sourceSets {
+	main {
+		java {
+			srcDirs = ['.']
+			include '*.java'
+		}
+		resources {
+			srcDirs = []
+		}
+	}
+}
+
 processResources {
 	inputs.property "version", project.version
-	filesMatching("fabric.mod.json") {
-		expand "version": inputs.properties.version
+
+	from('.') {
+		include 'fabric.mod.json'
+		expand "version": project.version
+	}
+	from('.') {
+		include 'en_us.json'
+		into 'assets/lightningstrike/lang'
+	}
+	from('.') {
+		include 'lightning_strike.json'
+		into 'data/lightningstrike/enchantment'
+	}
+	from('.') {
+		include 'in_enchanting_table.json', 'on_random_loot.json'
+		into 'data/minecraft/tags/enchantment'
 	}
 }
 
@@ -31,7 +55,6 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 java {
-	withSourcesJar()
 	sourceCompatibility = JavaVersion.VERSION_25
 	targetCompatibility = JavaVersion.VERSION_25
 }
