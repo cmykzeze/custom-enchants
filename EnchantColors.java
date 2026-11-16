@@ -10,6 +10,7 @@ public final class EnchantColors {
 	public static final int RAGE = 0xFF7A1A;             // orange
 	public static final int FROZEN_HEART = 0x66CCFF;     // ice blue
 	public static final int BLEED = 0xFF3355;            // crimson
+	public static final int SHADOW_STEP = 0x9B4DFF;       // violet
 	public static final int GRAY = 0xAAAAAA;
 	public static final int LOCKED = 0xFF5555;           // the only plain red, used for the lockout
 

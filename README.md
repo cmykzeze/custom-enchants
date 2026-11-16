@@ -1,6 +1,6 @@
-# Lightning Strike + Rage + Frozen Heart + Bleed (Fabric, Minecraft 26.3)
+# Lightning Strike + Rage + Frozen Heart + Bleed + Shadow Step (Fabric, Minecraft 26.3)
 
-Four sword enchantments.
+Five sword enchantments.
 
 **Lightning Strike (I-V)** (yellow): left-click with an enchanted sword. Yellow beams hit hostile mobs and other
 players in range (one beam per target, nearest first). Level N gives 2N beams and 10 + 5(N-1) blocks of range.
@@ -34,6 +34,14 @@ Lightning Strike beams do not trigger it. Found in the enchanting table and rand
 - While your target bleeds, your own melee damage is reduced by 5% / 10% / 15% / 20%.
 - A new proc on a bleeding target refreshes it (no stacking). Lightning Strike beams do not trigger it.
 
+**Shadow Step (I-III)** (violet): right-click with the sword while aiming at a hostile mob or player. You teleport
+right behind it, facing its back.
+- Range: 8 / 11 / 14 blocks (players: 10 at most). The target must be near your crosshair and in line of sight.
+- Cooldown: 12s / 10s / 8s. A READY ping plays when it comes back.
+- **Backstab:** your next normal melee hit within 4 seconds deals +1.0 / +1.5 / +2.0 hearts. The bonus is spent by
+  that hit, or lost if the 4 seconds run out or you put the sword away.
+- Needs room behind the target, otherwise the step fails (no cooldown used). Found in the enchanting table and random chest loot.
+
 Build: `./gradlew build` -> `build/libs/lightning-strike-1.0.0.jar`
 Test in dev: `./gradlew runClient`
-/give @s diamond_sword[enchantments={"lightningstrike:rage":7,"lightningstrike:lightning_strike":5,"lightningstrike:frozen_heart":2,"lightningstrike:bleed":4}]
+/give @s diamond_sword[enchantments={"lightningstrike:rage":7,"lightningstrike:lightning_strike":5,"lightningstrike:frozen_heart":2,"lightningstrike:bleed":4,"lightningstrike:shadow_step":3}]
