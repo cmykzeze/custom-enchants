@@ -14,7 +14,7 @@ import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntPr
 
 /**
  * Adds Rage books to chests:
- *  - Ancient City chests: levels VII to X only (12% chance per chest)
+ *  - Ancient City chests: level VII only (12% chance per chest)
  *  - a few common chests: levels I to VI (4% chance per chest)
  */
 public class RageLoot {
@@ -37,10 +37,7 @@ public class RageLoot {
 
 			if (ancientCity) {
 				pool.when(LootItemRandomChanceCondition.randomChance(ANCIENT_CITY_CHANCE));
-				pool.add(book(rage, 7, 40));
-				pool.add(book(rage, 8, 30));
-				pool.add(book(rage, 9, 20));
-				pool.add(book(rage, 10, 10));
+				pool.add(book(rage, 7, 1));
 			} else {
 				pool.when(LootItemRandomChanceCondition.randomChance(COMMON_CHEST_CHANCE));
 				pool.add(book(rage, 1, 30));

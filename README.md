@@ -2,28 +2,36 @@
 
 Four sword enchantments.
 
-**Lightning Strike (I-V)**: left-click with an enchanted sword. Yellow beams hit hostile mobs and other
-players in range (one beam per target, nearest first, 4 hearts each). If there is only one enemy in range,
-all branches focus on it and the hit does 1.5x damage (6 hearts). Level N gives 2N beams and
-10 + 5(N-1) blocks of range. The higher the level, the shorter the cooldown:
-I = 10s, II = 8.75s, III = 7.5s, IV = 6.25s, V = 5s.
+**Lightning Strike (I-V)** (yellow): left-click with an enchanted sword. Yellow beams hit hostile mobs and other
+players in range (one beam per target, nearest first). Level N gives 2N beams and 10 + 5(N-1) blocks of range.
+- Damage per beam: 3 / 3.25 / 3.5 / 3.75 / 4 hearts (I to V). With only one enemy in range the hit is 1.25x.
+- Against players: 60% damage and a 20 block range cap.
+- Normal cooldown: I = 10s, II = 8.75s, III = 7.5s, IV = 6.25s, V = 5s.
+- **Melee buff:** every normal melee hit on a mob or player shortens the cooldown (8 hits reach the floor:
+  I = 4s, II = 3.5s, III = 3s, IV = 2.5s, V = 2s). Beams and blocked hits don't count, and neither do swings
+  faster than about 0.5s apart. A running cooldown shortens too.
+- 8 seconds without a melee hit, or dying, loses the buff and locks you out of it for 30 seconds (the sword
+  still works at its normal cooldown).
+- Clicking while on cooldown shows the time left, buff progress (e.g. 5/8 hits), MAX or LOCKED in the action bar
+  (once per second at most). A READY ping plays when it comes back.
 
-**Rage (I-VII)**: bonus melee damage while holding the sword.
-- Alone: +0.4 hearts at I, +0.6 at V, +0.7 at VII.
-- With Lightning Strike on the same sword: every enemy a strike hits adds +0.4 (I) to +0.56 (VII) hearts,
-  up to a cap of 2.2 (I) to 3.1 (VII) hearts. The bonus is lost after 5 seconds out of combat.
+**Rage (I-VII)** (orange): bonus melee damage while holding the sword, shown in the action bar.
+- Flat bonus: +0.4 hearts at I, +0.8 at V, +1.0 at VII.
+- With Lightning Strike on the same sword: every enemy a strike hits adds +0.25 (I) to +0.30 (VII) hearts on top
+  of the flat bonus, up to a total cap of 1.4 (I) / 2.0 (V) / 2.2 (VII) hearts (about 4 enemy hits). The combo
+  is lost after 5 seconds out of combat; the flat bonus stays.
 - Levels I-V come from the enchanting table (VI and above are blocked there). Levels I-VI also appear in
   dungeon, mineshaft, desert pyramid and jungle temple chests (4%). Level VII only appears in
-  ancient city chests (12%). Two level VI books can still be combined in an anvil to make VII.
+  ancient city chests (12%). Two level VI books can still be combined in an anvil to make VII (the maximum).
 
-**Frozen Heart (I-II)**: a normal sword hit has a chance to slow the target for 5 seconds.
-Level I = Slowness I with a 50% chance, level II = Slowness II with a 60% chance.
+**Frozen Heart (I-II)** (ice blue): a normal sword hit has a chance to slow the target.
+Level I = Slowness I for 3s with a 40% chance, level II = Slowness II for 2s with a 50% chance.
 Lightning Strike beams do not trigger it. Found in the enchanting table and random chest loot.
 
-**Bleed (I-IV)**: a normal sword hit has a 20% / 25% / 30% / 35% chance to make the target bleed for 4 seconds.
-- Blood pulses once per second (4 pulses), ignoring armor: 1 / 2 / 3 / 4 hearts in total.
-- Blinds the target when the bleed starts: 1s at I-II, 2s at III-IV.
-- While your target bleeds, your own melee damage is reduced by 15% / 25% / 35% / 40%.
+**Bleed (I-IV)** (crimson): a normal sword hit has a 20% / 25% / 30% / 35% chance to make the target bleed for 4 seconds.
+- Blood pulses once per second (4 pulses), ignoring armor: 1.5 / 2.5 / 3.5 / 4.5 hearts in total.
+- Blinds the target when the bleed starts: 0.5s at I-II, 1s at III-IV.
+- While your target bleeds, your own melee damage is reduced by 5% / 10% / 15% / 20%.
 - A new proc on a bleeding target refreshes it (no stacking). Lightning Strike beams do not trigger it.
 
 Build: `./gradlew build` -> `build/libs/lightning-strike-1.0.0.jar`

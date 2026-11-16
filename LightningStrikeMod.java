@@ -16,6 +16,8 @@ public class LightningStrikeMod implements ModInitializer {
 				(payload, context) -> LightningStrikeAbility.activate(context.player()));
 
 		ServerTickEvents.END_SERVER_TICK.register(RageAbility::tick);
+		ServerTickEvents.END_SERVER_TICK.register(LightningStrikeAbility::tick);
+		LightningStrikeAbility.register();
 		RageLoot.register();
 		FrozenHeartAbility.register();
 		BleedAbility.register();

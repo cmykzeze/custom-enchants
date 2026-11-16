@@ -49,30 +49,30 @@ public class BleedAbility {
 	// ---- Tweak these numbers if you want ----
 	private static final int PULSES = 4;               // 4 pulses...
 	private static final int PULSE_INTERVAL_TICKS = 20; // ...one per second = 4 seconds of bleeding
-	private static final DustParticleOptions BLOOD = new DustParticleOptions(0xB00000, 1.2f);
+	private static final DustParticleOptions BLOOD = new DustParticleOptions(EnchantColors.BLEED, 1.2f);
 
 	/** Chance per hit: I = 20%, II = 25%, III = 30%, IV = 35% */
 	private static float chance(int level) {
 		return 0.15f + 0.05f * level;
 	}
 
-	/** Total bleed damage in hearts over the whole bleed: I = 1, II = 2, III = 3, IV = 4 */
+	/** Total bleed damage in hearts over the whole bleed: I = 1.5, II = 2.5, III = 3.5, IV = 4.5 */
 	private static float totalHearts(int level) {
-		return clampLevel(level);
+		return clampLevel(level) + 0.5f;
 	}
 
-	/** Blindness in ticks: I and II = 1 second, III and IV = 2 seconds */
+	/** Blindness in ticks: I and II = 0.5 seconds, III and IV = 1 second */
 	private static int blindnessTicks(int level) {
-		return clampLevel(level) >= 3 ? 40 : 20;
+		return clampLevel(level) >= 3 ? 20 : 10;
 	}
 
-	/** How much of your own melee damage you lose while a target bleeds: I = 15%, II = 25%, III = 35%, IV = 40% */
+	/** How much of your own melee damage you lose while a target bleeds: I = 5%, II = 10%, III = 15%, IV = 20% */
 	private static double penalty(int level) {
 		return switch (clampLevel(level)) {
-			case 1 -> 0.15;
-			case 2 -> 0.25;
-			case 3 -> 0.35;
-			default -> 0.40;
+			case 1 -> 0.05;
+			case 2 -> 0.10;
+			case 3 -> 0.15;
+			default -> 0.20;
 		};
 	}
 

@@ -19,7 +19,7 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 
 /**
  * Frozen Heart (levels I and II): when you hit something with a normal sword attack there is a chance
- * to slow it for 5 seconds. Level I = Slowness I with a 50% chance, level II = Slowness II with a 60% chance.
+ * to slow it. Level I = Slowness I for 3s with a 40% chance, level II = Slowness II for 2s with a 50% chance.
  * Lightning Strike beams do not trigger it (only normal melee hits do).
  */
 public class FrozenHeartAbility {
@@ -27,11 +27,14 @@ public class FrozenHeartAbility {
 			Registries.ENCHANTMENT, Identifier.fromNamespaceAndPath(LightningStrikeMod.MOD_ID, "frozen_heart"));
 
 	// ---- Tweak these numbers if you want ----
-	private static final int SLOW_TICKS = 100; // 5 seconds
+	/** Slow duration: I = 3 seconds, II = 2 seconds (shorter but stronger at II) */
+	private static int slowTicks(int level) {
+		return level >= 2 ? 40 : 60;
+	}
 
-	/** Chance per hit: I = 50%, II = 60% */
+	/** Chance per hit: I = 40%, II = 50% */
 	private static float chance(int level) {
-		return 0.4f + 0.1f * level;
+		return 0.3f + 0.1f * level;
 	}
 
 	/** Slowness level: I = Slowness I, II = Slowness II (the game counts amplifier from 0) */
@@ -54,7 +57,7 @@ public class FrozenHeartAbility {
 			if (level <= 0 || player.getRandom().nextFloat() >= chance(level)) {
 				return;
 			}
-			entity.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, SLOW_TICKS, amplifier(level)));
+			entity.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, slowTicks(level), amplifier(level)));
 		});
 	}
 

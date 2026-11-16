@@ -1,5 +1,5 @@
 {
-  "description": { "translate": "enchantment.lightningstrike.bleed" },
+  "description": { "translate": "enchantment.lightningstrike.bleed", "color": "#FF3355" },
   "supported_items": "#minecraft:swords",
   "weight": 2,
   "max_level": 4,

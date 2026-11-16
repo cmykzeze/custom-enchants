@@ -1,5 +1,5 @@
 {
-  "description": { "translate": "enchantment.lightningstrike.frozen_heart" },
+  "description": { "translate": "enchantment.lightningstrike.frozen_heart", "color": "#66CCFF" },
   "supported_items": "#minecraft:swords",
   "weight": 2,
   "max_level": 2,

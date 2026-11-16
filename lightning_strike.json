@@ -1,5 +1,5 @@
 {
-  "description": { "translate": "enchantment.lightningstrike.lightning_strike" },
+  "description": { "translate": "enchantment.lightningstrike.lightning_strike", "color": "#FFE600" },
   "supported_items": "#minecraft:swords",
   "weight": 1,
   "max_level": 5,
