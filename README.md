@@ -1,6 +1,6 @@
 # Lightning Strike + Rage + Frozen Heart + Bleed + Shadow Step (Fabric, Minecraft 26.3)
 
-Five sword enchantments.
+Five sword enchantments and two mace enchantments.
 
 **Lightning Strike (I-V)** (yellow): left-click with an enchanted sword. Yellow beams hit hostile mobs and other
 players in range (one beam per target, nearest first). Level N gives 2N beams and 10 + 5(N-1) blocks of range.
@@ -41,6 +41,20 @@ right behind it, facing its back.
 - **Backstab:** your next normal melee hit within 4 seconds deals +1.0 / +1.5 / +2.0 hearts. The bonus is spent by
   that hit, or lost if the 4 seconds run out or you put the sword away.
 - Needs room behind the target, otherwise the step fails (no cooldown used). Found in the enchanting table and random chest loot.
+
+**Thunder Clap (I-III)** (aqua, mace only): a normal mace hit has a chance to call down a real lightning bolt on the target.
+- Chance: 25% / 35% / 45%. Stun: 1.0s / 1.25s / 1.5s.
+- The bolt deals normal lightning damage (2.5 hearts) and stuns the target in place: mobs lose their AI (no moving or
+  attacking), players can't move or jump (they can still look and swing).
+- The bolt is visual-only for safety: no fire, no damage to you if you stand next to the target, and no mob transformations.
+- A new proc on a stunned target refreshes the stun (no stacking). Found in the enchanting table and random chest loot.
+
+**Aftershock (I-III)** (amber, mace only): after a smash attack (a mace hit after falling more than 1.5 blocks) the ground
+cracks, and 1 second later a shockwave bursts out of the impact spot.
+- Radius: 3 / 4 / 5 blocks. Damage: 30% / 40% / 50% of the smash damage (max 12 hearts), so a longer fall means a bigger blast.
+- Hits hostile mobs and players (never you), and throws them up and away from the centre.
+- Cooldown: 8s / 7s / 6s. The shockwave is magic damage, so it does not trigger Thunder Clap, Bleed or other on-hit enchantments.
+- Found in the enchanting table and random chest loot.
 
 Build: `./gradlew build` -> `build/libs/lightning-strike-1.0.0.jar`
 Test in dev: `./gradlew runClient`

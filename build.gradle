@@ -41,11 +41,11 @@ processResources {
 		into 'assets/lightningstrike/lang'
 	}
 	from('.') {
-		include 'lightning_strike.json', 'rage.json', 'frozen_heart.json', 'bleed.json', 'shadow_step.json'
+		include 'lightning_strike.json', 'rage.json', 'frozen_heart.json', 'bleed.json', 'shadow_step.json', 'thunder_clap.json', 'aftershock.json'
 		into 'data/lightningstrike/enchantment'
 	}
 	from('.') {
-		include 'in_enchanting_table.json', 'on_random_loot.json'
+		include 'in_enchanting_table.json', 'on_random_loot.json', 'non_treasure.json'
 		into 'data/minecraft/tags/enchantment'
 	}
 }
