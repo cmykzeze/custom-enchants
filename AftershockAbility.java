@@ -199,12 +199,24 @@ public class AftershockAbility {
 			if (!t.isAlive()) {
 				continue;
 			}
-			// knockback() pushes away from the point it is given, so give it the centre-to-target direction
-			t.knockback(strength, -dx, -dz);
+			// push away from the centre: (dx, dz) is the centre-to-target direction
+			push(t, strength, dx, dz);
 			if (t instanceof ServerPlayer sp) {
 				sp.connection.send(new ClientboundSetEntityMotionPacket(sp));
 			}
 		}
+	}
+
+	/** Throws the target away from the centre (dx, dz = centre-to-target direction) and a bit upwards. */
+	private static void push(LivingEntity t, double strength, double dx, double dz) {
+		double len = Math.sqrt(dx * dx + dz * dz);
+		if (len < 1.0E-4) {
+			dx = 1.0;
+			dz = 0.0;
+			len = 1.0;
+		}
+		t.setDeltaMovement(t.getDeltaMovement().scale(0.5)
+				.add(dx / len * strength * 0.8, 0.3 + strength * 0.2, dz / len * strength * 0.8));
 	}
 
 	private static double pick(double[] table, int level) {

@@ -16,14 +16,14 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.EntitySpawnReason;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -90,12 +90,7 @@ public class ThunderClapAbility {
 
 	private static void clap(ServerLevel level, ServerPlayer player, LivingEntity target, int lvl) {
 		// The lightning itself: bright flash + thunder, no fire and no side effects
-		LightningBolt bolt = EntityType.LIGHTNING_BOLT.create(level, EntitySpawnReason.TRIGGERED);
-		if (bolt != null) {
-			bolt.setPos(target.getX(), target.getY(), target.getZ());
-			bolt.setVisualOnly(true);
-			level.addFreshEntity(bolt);
-		}
+		boltEffect(level, target);
 		level.sendParticles(ParticleTypes.ELECTRIC_SPARK, target.getX(), target.getY() + target.getBbHeight() * 0.5,
 				target.getZ(), 25, 0.4, 0.6, 0.4, 0.2);
 
@@ -125,6 +120,24 @@ public class ThunderClapAbility {
 
 		player.sendSystemMessage(EnchantColors.text(
 				"Thunder Clap!", EnchantColors.THUNDER_CLAP), true);
+	}
+
+	/**
+	 * A lightning bolt drawn with particles (a jagged column from the sky onto the target) plus the thunder sound.
+	 * It is only a visual: no fire, no extra damage, nothing is transformed.
+	 */
+	private static void boltEffect(ServerLevel level, LivingEntity target) {
+		DustParticleOptions aqua = new DustParticleOptions(EnchantColors.THUNDER_CLAP, 1.3f);
+		double x = target.getX();
+		double z = target.getZ();
+		for (double h = 0; h <= 14; h += 0.5) {
+			x += (target.getRandom().nextDouble() - 0.5) * 0.35;
+			z += (target.getRandom().nextDouble() - 0.5) * 0.35;
+			level.sendParticles(ParticleTypes.ELECTRIC_SPARK, x, target.getY() + 14 - h, z, 2, 0.05, 0.0, 0.05, 0.02);
+			level.sendParticles(aqua, x, target.getY() + 14 - h, z, 1, 0.0, 0.0, 0.0, 0.0);
+		}
+		level.playSound(null, target.blockPosition(), SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.WEATHER,
+				2.0f, 1.0f);
 	}
 
 	/** Runs every server tick: ends stuns and gives mobs their AI back. */

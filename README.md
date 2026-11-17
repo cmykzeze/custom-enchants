@@ -42,11 +42,11 @@ right behind it, facing its back.
   that hit, or lost if the 4 seconds run out or you put the sword away.
 - Needs room behind the target, otherwise the step fails (no cooldown used). Found in the enchanting table and random chest loot.
 
-**Thunder Clap (I-III)** (aqua, mace only): a normal mace hit has a chance to call down a real lightning bolt on the target.
+**Thunder Clap (I-III)** (aqua, mace only): a normal mace hit has a chance to call down a lightning bolt on the target (drawn with particles and the thunder sound).
 - Chance: 25% / 35% / 45%. Stun: 1.0s / 1.25s / 1.5s.
 - The bolt deals normal lightning damage (2.5 hearts) and stuns the target in place: mobs lose their AI (no moving or
   attacking), players can't move or jump (they can still look and swing).
-- The bolt is visual-only for safety: no fire, no damage to you if you stand next to the target, and no mob transformations.
+- The bolt is a visual only: no fire, no damage to you if you stand next to the target, and no mob transformations.
 - A new proc on a stunned target refreshes the stun (no stacking). Found in the enchanting table and random chest loot.
 
 **Aftershock (I-III)** (amber, mace only): after a smash attack (a mace hit after falling more than 1.5 blocks) the ground
