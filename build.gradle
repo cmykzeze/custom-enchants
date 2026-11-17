@@ -45,7 +45,7 @@ processResources {
 		into 'data/lightningstrike/enchantment'
 	}
 	from('.') {
-		include 'in_enchanting_table.json', 'on_random_loot.json', 'non_treasure.json'
+		include 'in_enchanting_table.json', 'on_random_loot.json'
 		into 'data/minecraft/tags/enchantment'
 	}
 }

@@ -59,3 +59,9 @@ cracks, and 1 second later a shockwave bursts out of the impact spot.
 Build: `./gradlew build` -> `build/libs/lightning-strike-1.0.0.jar`
 Test in dev: `./gradlew runClient`
 /give @s diamond_sword[enchantments={"lightningstrike:rage":7,"lightningstrike:lightning_strike":5,"lightningstrike:frozen_heart":2,"lightningstrike:bleed":4,"lightningstrike:shadow_step":3}]
+
+Mace test commands:
+/give @s mace[enchantments={"lightningstrike:thunder_clap":3,"lightningstrike:aftershock":3}]
+/give @s enchanted_book[stored_enchantments={"lightningstrike:thunder_clap":3}]
+
+Note: Thunder Clap and Aftershock point straight at `minecraft:mace` (not at an item tag), so they always show up for the mace.
